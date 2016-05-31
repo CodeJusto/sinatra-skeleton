@@ -20,3 +20,8 @@ post '/create' do
   end
 end
 
+get '/delete/:id' do
+  @contact = Contact.find(params[:id]).destroy
+  headers("Content-Type" => "application/json") 
+  json @contact.as_json
+end
