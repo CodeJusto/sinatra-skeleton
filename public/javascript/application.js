@@ -1,6 +1,7 @@
 $(document).ready(function() {
 
   loadContacts();
+  $('.editor').hide();
   // $('.hideButton').on('click', function() {
   //   console.log("hello")
   //   // $('#name').empty();
@@ -28,7 +29,7 @@ $(document).ready(function() {
   var column_number = 0;
 
   function count() {
-    if (column_number > 6) {
+    if (column_number > 5) {
       return column_number = 1;
     } else {
       return column_number += 1;
@@ -36,6 +37,7 @@ $(document).ready(function() {
   }
 
   function loadContacts() {
+    $('.column').empty();
      $.ajax({
       url: '/contacts',
       method: 'GET',
@@ -49,20 +51,59 @@ $(document).ready(function() {
               <a class="erase" href="#">Delete</a>\
             </div>'
             )
-          $('#contact_' + contact.id).append('<span id=' + contact.id + '>' + contact.name + '</span>', "<br>");
+          $('#contact_' + contact.id).append(contact.name, "<br>");
           $('#email_' + contact.id).append(contact.email, "<br>");           
         });
       }
     });
   }
 
+  //EDIT
   $('.results').on('click','.edit',function(e) {
     e.stopPropagation();
     e.preventDefault();
     thisID = $(this).parent().data("id");
     console.log("Now editing contact number " + thisID);
+     $.ajax({
+      url: '/show/'+ thisID,
+      method: 'GET',
+      success: function(data) {
+       console.log(data);
+       var $displayName = data.name;
+       var $displayEmail = data.email;
+       $('.editUser').empty();
+       $('.editUser').append(
+        '<article class="media">\
+          <figure class="media-left">\
+            <p class="image is-64x64">\
+              <img src="http://placehold.it/128x128">\
+            </p>\
+          </figure>\
+          <div class="media-content">\
+            <div class="content">\
+              <p>\
+                <strong ="userName">'+ $displayName + '</strong> <small class="userEmail">' + $displayEmail + '</small>\
+                <br>\
+                <em class="userDesc">Enter a description about this contact here!</em>\
+              </p>\
+            </div>\
+          </div>\
+        </article>'
+        )
+    $('.modal').addClass('is-active');
+      }
+    });
+    // var contactDiv = $('[data-id="' + thisID + '"]')
+    // debugger
+
+    //TODO
   });
 
+  $('.modal-close').on('click', function() {
+    $(this).closest('.modal').removeClass('is-active');
+  });
+
+  //DELETE
   $('.results').on('click','.erase',function(e) {
     e.stopPropagation();
     e.preventDefault();
@@ -74,56 +115,26 @@ $(document).ready(function() {
         success: function(data) {
           console.log(data)
           $('[data-id="' + data.id + '"]').remove();
-          // $(this).parent().remove();
         }
       });
   });
 
-
-
-
+  //CREATE
   $('.addContact').on('submit', function(e) {
     e.preventDefault();
     e.stopPropagation();
     $.post('/create', {name: $('.nameInput').val(), email: $('.emailInput').val()},
       function(returnedData) {
-       // $('.results').append(
-          $('.col' + count()).append(
-            '<div class="box" data-id="' + returnedData.id + '">\
-              <p id="contact_' + returnedData.id + '"></p>\
-              <p id="email_' + returnedData.id + '"></p>\
-              <a class="edit" href="#">Edit</a>\
-              <a class="erase" href="#">Delete</a>\
-            </div>');
-          $('#contact_' + returnedData.id).append('<span id=' + returnedData.id + '>' + returnedData.name + '</span>', "<br>");
-          $('#email_' + returnedData.id).append(returnedData.email, "<br>"); 
+        $('.col' + count()).append(
+          '<div class="box" data-id="' + returnedData.id + '">\
+            <p id="contact_' + returnedData.id + '"></p>\
+            <p id="email_' + returnedData.id + '"></p>\
+            <a class="edit" href="#">Edit</a>\
+            <a class="erase" href="#">Delete</a>\
+          </div>');
+        $('#contact_' + returnedData.id).append('<span id=' + returnedData.id + '>' + returnedData.name + '</span>', "<br>");
+        $('#email_' + returnedData.id).append(returnedData.email, "<br>"); 
       console.log(returnedData);
       });
   });
-
-    // $.ajax({
-    //   url: '/create',
-    //   method: 'POST',
-    //   success: function(data) {
-    //     $('.nameInput').val('');
-    //     $('.emailInput').val('');
-    //   }
-    // })
-  // });
-
-
-
-  // $(function () {
-  //   var button = $('#load-more-posts');
-  //   button.one('click', function () {
-  //     $.ajax({
-  //       url: 'more-posts.html',
-  //       method: 'GET',
-  //       success: function (morePostsHtml) {
-  //         button.replaceWith(morePostsHtml);
-  //       }
-  //     });
-  //   });
-  // });
-  // See: http://docs.jquery.com/Tutorials:Introducing_$(document).ready()
 });

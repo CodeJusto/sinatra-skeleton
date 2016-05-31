@@ -18,10 +18,17 @@ post '/create' do
   if @contact.save
     json @contact.as_json
   end
+  ## Add an else statement to let people know there was an error
 end
 
 get '/delete/:id' do
   @contact = Contact.find(params[:id]).destroy
+  headers("Content-Type" => "application/json") 
+  json @contact.as_json
+end
+
+get '/show/:id' do
+  @contact = Contact.find(params[:id])
   headers("Content-Type" => "application/json") 
   json @contact.as_json
 end
