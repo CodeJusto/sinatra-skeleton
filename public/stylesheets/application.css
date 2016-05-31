@@ -1,0 +1,8 @@
+.hidden {
+  display: none;
+}
+
+button {
+  float: left;
+  /*display: none;*/
+}
